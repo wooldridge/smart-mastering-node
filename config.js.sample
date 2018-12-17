@@ -1,6 +1,6 @@
 var config = {};
 
-config.path = "/Users/mwooldri/projects/smart-mastering-node/"; // include trailing "/"
+config.path = "/PATH/TO/smart-mastering-node/"; // include trailing "/"
 config.host = "localhost";
 
 config.database = {
@@ -18,8 +18,8 @@ config.server = {
 }
 
 config.auth = {
-  "user": "admin",
-  "pass": "admin",
+  "user": "USERNAME",
+  "pass": "PASSWORD",
   "sendImmediately": false
 };
 
