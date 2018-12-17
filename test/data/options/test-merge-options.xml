@@ -1,0 +1,34 @@
+<options xmlns="http://marklogic.com/smart-mastering/merging">
+  <match-options>test-match-options</match-options>
+  <property-defs>
+    <property namespace="" localname="id" name="id"/>
+    <property namespace="" localname="fname" name="fname"/>
+    <property namespace="" localname="lname" name="lname"/>
+    <property namespace="" localname="addr" name="addr1"/>
+    <property namespace="" localname="state" name="state"/>
+    <property namespace="" localname="zip" name="zip"/>
+  </property-defs>
+  <merging>
+    <merge property-name="fname" max-values="1">
+      <length weight="10"/>
+    </merge>
+    <merge property-name="lname" max-values="1">
+      <length weight="10"/>
+    </merge>
+    <merge property-name="addr" max-values="1">
+      <source-weights>
+        <source name="Source1" weight="10"/>
+      </source-weights>
+    </merge>
+    <merge property-name="state" max-values="1">
+      <source-weights>
+        <source name="Source1" weight="10"/>
+      </source-weights>
+    </merge>
+    <merge property-name="zip" max-values="1">
+      <source-weights>
+        <source name="Source2" weight="10"/>
+      </source-weights>
+    </merge>
+  </merging>
+</options>

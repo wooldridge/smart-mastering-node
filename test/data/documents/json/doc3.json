@@ -1,0 +1,16 @@
+{
+  "envelope": {
+    "headers": {},
+    "triples": [],
+    "instance": {
+      "id": "3",
+      "fname": "John",
+      "lname": "Doe",
+      "addr": "3 C St.",
+      "state": "WA",
+      "zip": "90000-1234",
+      "ts": "2018-04-26T16:33:00.0000Z"
+    },
+    "attachments": []
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "options":
+  {
+    "matchOptions": "match-options",
+    "propertyDefs":
+    {
+      "properties": [
+        { "namespace": "", "localname": "id", "name": "id" },
+        { "namespace": "", "localname": "fname", "name": "fname" },
+        { "namespace": "", "localname": "lname", "name": "lname" },
+        { "namespace": "", "localname": "addr", "name": "addr" },
+        { "namespace": "", "localname": "state", "name": "state" },
+        { "namespace": "", "localname": "zip", "name": "zip" },
+        { "path": "/envelope/instance/ts", "name": "ts" }
+      ],
+      "namespaces":{}
+    },
+    "algorithms":
+    {
+      "stdAlgorithm":
+      {
+        "namespaces":{},
+        "timestamp":
+        {
+          "path": "/envelope/instance/ts"
+        }
+      },
+      "custom": [],
+      "collections": {}
+    },
+    "merging": [
+      {
+        "propertyName": "fname",
+        "algorithmRef": "standard",
+        "maxValues": "1",
+        "sourceWeights": {
+          "source": {
+            "name": "sourceA",
+            "weight": "10"
+          }
+        }
+      }
+    ],
+    "tripleMerge":{}
+  }
+}

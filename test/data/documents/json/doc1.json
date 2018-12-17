@@ -1,0 +1,37 @@
+{
+  "envelope": {
+    "attachments": {
+      "envelope": {
+        "attachments": null,
+        "headers": {},
+        "instance": {
+          "addr": "1 A St.",
+          "fname": "Mike",
+          "id": "1",
+          "lname": "Smith",
+          "state": "CA",
+          "ts": "2018-04-26T16:31:00.0000Z",
+          "zip": "90000"
+        },
+        "triples": []
+      }
+    },
+    "headers": {},
+    "instance": {
+      "Person": {
+        "addr": "1 A St.",
+        "fname": "Mike",
+        "id": "1",
+        "lname": "Smith",
+        "state": "CA",
+        "ts": "2018-04-26T16:31:00.0000Z",
+        "zip": "90000"
+      },
+      "info": {
+        "title": "Person",
+        "version": "0.0.1"
+      }
+    },
+    "triples": []
+  }
+}

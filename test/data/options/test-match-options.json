@@ -1,0 +1,87 @@
+{
+  "options": {
+    "dataFormat": "json",
+    "propertyDefs": {
+      "property": [
+        { "namespace": "", "localname": "fname", "name": "fname" },
+        { "namespace": "", "localname": "lname", "name": "lname" },
+        { "namespace": "", "localname": "addr", "name": "addr" },
+        { "namespace": "", "localname": "state", "name": "state" },
+        { "namespace": "", "localname": "zip", "name": "zip" }
+      ]
+    },
+    "algorithms": {
+      "algorithm": [
+        { "name": "std-reduce", "function": "standard-reduction" },
+        { "name": "dbl-metaphone", "function": "double-metaphone" },
+        {
+          "name": "thesaurus",
+          "namespace": "http://marklogic.com/smart-mastering/algorithms",
+          "function": "thesaurus",
+          "at": "/com.marklogic.smart-mastering/algorithms/thesaurus.xqy"
+        },
+        {
+         "name": "dbl-metaphone",
+         "namespace": "http://marklogic.com/smart-mastering/algorithms",
+         "function": "double-metaphone",
+         "at": "/com.marklogic.smart-mastering/algorithms/double-metaphone.xqy"
+        },
+        {
+          "name": "zip-code",
+          "namespace": "http://marklogic.com/smart-mastering/algorithms",
+          "function": "zip-match",
+          "at": "/com.marklogic.smart-mastering/algorithms/zip.xqy"
+        },
+        { "name": "std-reduce", "function": "standard-reduction" }
+      ]
+    },
+    "scoring": {
+      "add": [
+        { "propertyName": "fname", "weight": "6" },
+        { "propertyName": "lname", "weight": "4" },
+        { "propertyName": "state", "weight": "2" },
+        { "propertyName": "zip", "weight": "5" }
+      ],
+      "expand": [
+        {
+          "propertyName": "fname",
+          "algorithmRef": "thesaurus",
+          "weight": "8",
+          "thesaurus": "/first-name-thesaurus.xml"
+        },
+        {
+         "propertyName": "lname",
+         "algorithmRef": "dbl-metaphone",
+         "weight": "20",
+         "dictionary": "/last-names.xml",
+         "distance-threshold": 20,
+         "collation": "http://marklogic.com/collation/codepoint"
+        },
+        {
+          "propertyName": "zip",
+          "algorithmRef": "zip-code",
+          "zip": [
+            { "origin": 5, "weight": 3 },
+            { "origin": 9, "weight": 7 }
+          ]
+        }
+      ],
+      "reduce": [
+        {
+          "algorithmRef": "std-reduce",
+          "weight": "3",
+          "allMatch": { "property": ["lname", "addr"] }
+        }
+      ]
+    },
+    "actions": {},
+    "thresholds": {
+      "threshold": [
+        { "above": "2", "label": "Possible Match" },
+        { "above": "8", "label": "Likely Match", "action": "notify" },
+        { "above": "10", "label": "Definitive Match", "action": "merge" }
+      ]
+    },
+    "tuning": { "maxScan": "200" }
+  }
+}

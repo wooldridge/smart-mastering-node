@@ -1,0 +1,27 @@
+<options xmlns="http://marklogic.com/smart-mastering/matcher">
+  <property-defs>
+    <property namespace="" localname="id" name="id"/>
+    <property namespace="" localname="fname" name="fname"/>
+    <property namespace="" localname="lname" name="lname"/>
+    <property namespace="" localname="addr" name="addr1"/>
+    <property namespace="" localname="state" name="state"/>
+    <property namespace="" localname="zip" name="zip"/>
+  </property-defs>
+  <algorithms>
+  </algorithms>
+  <scoring>
+    <add property-name="fname" weight="10"/>
+    <add property-name="lname" weight="20"/>
+    <add property-name="addr" weight="15"/>
+    <add property-name="state" weight="2"/>
+    <add property-name="zip" weight="5"/>
+  </scoring>
+  <thresholds>
+    <threshold above="20" label="Possible Match"/>
+    <threshold above="30" label="Likely Match" action="notify"/>
+    <threshold above="32" label="Definitive Match" action="merge"/>
+  </thresholds>
+  <tuning>
+    <max-scan>200</max-scan>  <!-- never look at more than 200 -->
+  </tuning>
+</options>

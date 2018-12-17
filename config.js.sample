@@ -1,0 +1,28 @@
+var config = {};
+
+config.path = "/Users/mwooldri/projects/smart-mastering-node/"; // include trailing "/"
+config.host = "localhost";
+
+config.database = {
+  "content": {
+    "name": "minimal-smart-mastering-content"
+  },
+  "modules": {
+    "name": "minimal-smart-mastering-modules"
+  }
+};
+
+config.server = {
+  "name": "minimal-smart-mastering",
+  "port": 8800
+}
+
+config.auth = {
+  "user": "admin",
+  "pass": "admin",
+  "sendImmediately": false
+};
+
+if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
+  module.exports = config;
+}

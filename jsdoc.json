@@ -1,0 +1,25 @@
+{
+  "opts": {
+    "destination": "./docs",
+    "template": "./node_modules/ink-docstrap/template",
+    "readme": "README.md"
+  },
+  "source": {
+    "include": [ "./lib" ]
+  },
+  "templates": {
+    "theme": "cerulean",
+    "systemName": "Smart Mastering API for Node.js",
+    "navType": "vertical",
+    "inverseNav": true,
+    "includeDate": false,
+    "cleverLinks": false,
+    "monospaceLinks": false,
+    "linenums": true,
+    "search": false,
+    "sort": true,
+    "outputSourceFiles": false,
+    "outputSourcePath": false,
+    "methodHeadingReturns": true
+  }
+}

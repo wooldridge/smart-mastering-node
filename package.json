@@ -1,0 +1,21 @@
+{
+  "name": "smart-mastering-node",
+  "version": "0.0.1",
+  "description": "Smart Mastering API for Node.js",
+  "main": "./lib/sm.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "author": "Mike Wooldridge",
+  "license": "ISC",
+  "dependencies": {
+    "marklogic": "^2.1.1",
+    "request": "^2.88.0"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "ink-docstrap": "^1.3.2",
+    "jsdoc": "^3.5.5",
+    "mocha": "^5.2.0"
+  }
+}
