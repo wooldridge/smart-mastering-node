@@ -1,20 +1,27 @@
-const config = require('../config'),
-      chai = require('chai'),
-      marklogic = require('marklogic'),
-      matchBlocks = require('../lib/match-blocks'),
-      fs = require('fs');
+const chai = require('chai'),
+      sm = require('../lib/sm');
 
 const assert = chai.assert;
 
+let client = sm.createClient({
+  host: 'localhost',
+  port: 8800,
+  database: 'minimal-smart-mastering-content',
+  modules: 'minimal-smart-mastering-modules',
+  server: 'minimal-smart-mastering',
+  user: 'admin',
+  password: 'admin'
+});
+
 describe('Match Blocks', () => {
   it('should be written to database', () => {
-    return matchBlocks.write('doc1.json', 'doc2.json')
+    return client.matchBlocks.write('doc1.json', 'doc2.json')
     .then((res) => {
       assert.equal(res.statusCode, 204);
     })
   });
   it('should be read from the database', () => {
-    return matchBlocks.read('doc1.json')
+    return client.matchBlocks.read('doc1.json')
     .then((res) => {
       let blocks;
       if (res.body) {
@@ -27,7 +34,7 @@ describe('Match Blocks', () => {
   // Skip since is failing
   // https://github.com/marklogic-community/smart-mastering-core/issues/263
   xit('should be removed from the database', () => {
-    return matchBlocks.remove('doc1.json', 'doc2.json')
+    return client.matchBlocks.remove('doc1.json', 'doc2.json')
     .then((res) => {
       // console.log(res);
       // check something

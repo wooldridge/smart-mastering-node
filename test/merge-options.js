@@ -1,6 +1,5 @@
 const config = require('../config'),
       chai = require('chai'),
-      marklogic = require('marklogic'),
       sm = require('../lib/sm'),
       mergeOptions = require('../lib/merge-options'),
       fs = require('fs');
