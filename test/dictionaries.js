@@ -1,16 +1,16 @@
-const config = require('../config'),
-      chai = require('chai'),
-      marklogic = require('marklogic'),
-      dictionaries = require('../lib/dictionaries'),
-      fs = require('fs');
+const chai = require('chai'),
+      sm = require('../lib/sm');
 
 const assert = chai.assert;
 
-const db = marklogic.createDatabaseClient({
-  host: config.host,
-  user: config.auth.user,
-  password: config.auth.pass,
-  port: config.server.port
+let client = sm.createClient({
+  host: 'localhost',
+  port: 8800,
+  database: 'minimal-smart-mastering-content',
+  modules: 'minimal-smart-mastering-modules',
+  server: 'minimal-smart-mastering',
+  user: 'admin',
+  password: 'admin'
 });
 
 before((done) => {
@@ -20,7 +20,7 @@ before((done) => {
 
 describe('Dictionaries', () => {
   xit('should be listed', () => {
-    return dictionaries.list()
+    return client.dictionaries.list()
     .then((res) => {
       // TODO
     })

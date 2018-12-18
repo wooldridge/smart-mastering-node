@@ -1,20 +1,21 @@
 const config = require('../config'),
       chai = require('chai'),
-      marklogic = require('marklogic'),
-      mergeOptions = require('../lib/merge-options'),
-      merge = require('../lib/merge'),
+      sm = require('../lib/sm'),
       fs = require('fs');
 
 const assert = chai.assert;
 
-const testOptionsXML = fs.readFileSync(config.path + 'test/data/options/org-merge-options.xml').toString('utf8');
-
-const db = marklogic.createDatabaseClient({
-  host: config.host,
-  user: config.auth.user,
-  password: config.auth.pass,
-  port: config.server.port
+let client = sm.createClient({
+  host: 'localhost',
+  port: 8800,
+  database: 'minimal-smart-mastering-content',
+  modules: 'minimal-smart-mastering-modules',
+  server: 'minimal-smart-mastering',
+  user: 'admin',
+  password: 'admin'
 });
+
+const testOptionsXML = fs.readFileSync(config.path + 'test/data/options/org-merge-options.xml').toString('utf8');
 
 const path = config.path + 'test/data/documents/json/';
 const docs = [
@@ -31,9 +32,9 @@ const docs = [
 ]
 
 before((done) => {
-  db.documents.write(docs)
+  client.mlClient.documents.write(docs)
   .result((res) => {
-    return mergeOptions.write('org-merge-options', testOptionsXML);
+    return client.mergeOptions.write('org-merge-options', testOptionsXML);
   })
   .then((res) => {
     done();
@@ -41,9 +42,9 @@ before((done) => {
 });
 
 // after((done) => {
-//   db.documents.remove(['doc1.json', 'doc2.json'])
+//   client.mlClient.documents.remove(['doc1.json', 'doc2.json'])
 //   .result((res) => {
-//     return mergeOptions.remove('merge-options2');
+//     return client.mergeOptions.remove('merge-options2');
 //   })
 //   .then((res) => {
 //     done();
@@ -57,14 +58,14 @@ describe('Merge', () => {
       optionsName: 'org-merge-options',
       preview: true
     }
-    return merge.run(options)
+    return client.merge.run(options)
     .then((res) => {
       //console.log(res);
       // assert.isNotEmpty(res.body.results);
     })
   });
   xit('should be restored', () => {
-    return match.restore('docA.xml', true)
+    return client.match.restore('docA.xml', true)
     .then((res) => {
       console.log(res.body);
       // assert.isNotEmpty(res.body.results);

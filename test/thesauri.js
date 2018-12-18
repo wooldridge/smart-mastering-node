@@ -1,28 +1,48 @@
 const config = require('../config'),
       chai = require('chai'),
-      marklogic = require('marklogic'),
-      thesauri = require('../lib/thesauri'),
+      sm = require('../lib/sm'),
       fs = require('fs');
 
 const assert = chai.assert;
 
-const db = marklogic.createDatabaseClient({
-  host: config.host,
-  user: config.auth.user,
-  password: config.auth.pass,
-  port: config.server.port
+let client = sm.createClient({
+  host: 'localhost',
+  port: 8800,
+  database: 'minimal-smart-mastering-content',
+  modules: 'minimal-smart-mastering-modules',
+  server: 'minimal-smart-mastering',
+  user: 'admin',
+  password: 'admin'
 });
 
-before((done) => {
-  // Create thesauri
-  done();
-});
+let testThesaurus = `<?xml version="1.0" encoding="UTF-8"?>
+<thesaurus xmlns="http://marklogic.com/xdmp/thesaurus">
+ <entry>
+  <term>foo</term>
+  <synonym>
+   <term>bar</term>
+  </synonym>
+ </entry>
+</thesaurus>
+`;
 
 describe('Thesauri', () => {
-  xit('should be listed', () => {
-    return thesauri.list()
+  it('should be written', () => {
+    return client.thesauri.write('test.xml', testThesaurus)
     .then((res) => {
-      // TODO
+      assert.equal(res.documents[0].uri, '/mdm/config/thesauri/test.xml');
+    })
+  });
+  it('should be listed', () => {
+    return client.thesauri.list()
+    .then((res) => {
+      assert.isOk(res['availableThesauri']['/mdm/config/thesauri/test.xml']);
+    })
+  });
+  it('should be removed', () => {
+    return client.thesauri.remove('test.xml')
+    .then((res) => {
+      assert.isTrue(res.removed);
     })
   });
 });

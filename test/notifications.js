@@ -1,16 +1,17 @@
-const config = require('../config'),
-      chai = require('chai'),
-      marklogic = require('marklogic'),
-      notifications = require('../lib/notifications'),
+const chai = require('chai'),
+      sm = require('../lib/sm'),
       fs = require('fs');
 
 const assert = chai.assert;
 
-const db = marklogic.createDatabaseClient({
-  host: config.host,
-  user: config.auth.user,
-  password: config.auth.pass,
-  port: config.server.port
+let client = sm.createClient({
+  host: 'localhost',
+  port: 8800,
+  database: 'minimal-smart-mastering-content',
+  modules: 'minimal-smart-mastering-modules',
+  server: 'minimal-smart-mastering',
+  user: 'admin',
+  password: 'admin'
 });
 
 before((done) => {
@@ -20,7 +21,7 @@ before((done) => {
 
 describe('Notifications', () => {
   xit('should be listed', () => {
-    return notifications.list()
+    return client.notifications.list()
     .then((res) => {
       // TODO
     })
@@ -29,7 +30,7 @@ describe('Notifications', () => {
     let opts = {
       extracts: { "firstName": "PersonFirstName" }
     }
-    return notifications.list(opts)
+    return client.notifications.list(opts)
     .then((res) => {
       // TODO
     })
@@ -39,19 +40,19 @@ describe('Notifications', () => {
       start: 2,
       pageLength: 2
     }
-    return notifications.list(opts)
+    return client.notifications.list(opts)
     .then((res) => {
       // TODO
     })
   });
   xit('should be removed', () => {
-    return notifications.remove('notif1')
+    return client.notifications.remove('notif1')
     .then((res) => {
       // TODO
     })
   });
   xit('should be updated', () => {
-    return notifications.remove(['notif2'], 'unread')
+    return client.notifications.remove(['notif2'], 'unread')
     .then((res) => {
       // TODO
     })

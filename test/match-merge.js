@@ -1,12 +1,20 @@
 const config = require('../config'),
       chai = require('chai'),
       marklogic = require('marklogic'),
-      matchOptions = require('../lib/match-options'),
-      mergeOptions = require('../lib/merge-options'),
-      matchMerge = require('../lib/match-merge'),
+      sm = require('../lib/sm'),
       fs = require('fs');
 
 const assert = chai.assert;
+
+let client = sm.createClient({
+  host: 'localhost',
+  port: 8800,
+  database: 'minimal-smart-mastering-content',
+  modules: 'minimal-smart-mastering-modules',
+  server: 'minimal-smart-mastering',
+  user: 'admin',
+  password: 'admin'
+});
 
 const orgMatchOptionsXML = fs.readFileSync(config.path + 'test/data/options/org-match-options.xml').toString('utf8');
 const orgMergeOptionsXML = fs.readFileSync(config.path + 'test/data/options/org-merge-options.xml').toString('utf8');
@@ -15,13 +23,6 @@ const testMergeOptionsJSON = fs.readFileSync(config.path + 'test/data/options/te
 const testMatchOptionsXML = fs.readFileSync(config.path + 'test/data/options/test-match-options.xml').toString('utf8');
 const testMergeOptionsXML = fs.readFileSync(config.path + 'test/data/options/test-merge-options.xml').toString('utf8');
 //const testQuery = fs.readFileSync(config.path + 'test-query.xqy').toString('utf8');
-
-const db = marklogic.createDatabaseClient({
-  host: config.host,
-  user: config.auth.user,
-  password: config.auth.pass,
-  port: config.server.port
-});
 
 const path = config.path + 'test/data/documents/json/';
 // const docs = [
@@ -38,12 +39,12 @@ const path = config.path + 'test/data/documents/json/';
 // ]
 
 // before((done) => {
-//   db.documents.write(docs)
+//   client.mlClient.documents.write(docs)
 //   .result((res) => {
-//     return matchOptions.write('test-match-options', testMatchOptionsXML);
+//     return client.matchOptions.write('test-match-options', testMatchOptionsXML);
 //   })
 //   .then((res) => {
-//     return mergeOptions.write('test-merge-options', testMergeOptionsXML);
+//     return client.mergeOptions.write('test-merge-options', testMergeOptionsXML);
 //   })
 //   .then((res) => {
 //     done();
@@ -64,12 +65,12 @@ const docs = [
 ]
 
 before((done) => {
-  db.documents.write(docs)
+  client.mlClient.documents.write(docs)
   .result((res) => {
-    return matchOptions.write('org-match-options', orgMatchOptionsXML);
+    return client.matchOptions.write('org-match-options', orgMatchOptionsXML);
   })
   .then((res) => {
-    return mergeOptions.write('org-merge-options', orgMergeOptionsXML);
+    return client.mergeOptions.write('org-merge-options', orgMergeOptionsXML);
   })
   .then((res) => {
     done();
@@ -77,9 +78,9 @@ before((done) => {
 });
 
 // after((done) => {
-//   db.documents.remove(['docA.xml', 'docB.xml'])
+//   client.mlClient.documents.remove(['docA.xml', 'docB.xml'])
 //   .result((res) => {
-//     return mergeOptions.remove('merge-options-xml');
+//     return client.mergeOptions.remove('merge-options-xml');
 //   })
 //   .then((res) => {
 //     done();
@@ -92,7 +93,7 @@ describe('Match and Merge', () => {
       uris: ['doc1.json', 'doc2.json'],
       optionsName: 'test-merge-options'
     }
-    return matchMerge.run(options)
+    return client.matchMerge.run(options)
     .then((res) => {
       console.log(res.body);
       // assert.isNotEmpty(res.body.results);
@@ -103,7 +104,7 @@ describe('Match and Merge', () => {
       uris: ['org1.json', 'orgA.json'],
       optionsName: 'org-merge-options'
     }
-    return matchMerge.run(options)
+    return client.matchMerge.run(options)
     .then((res) => {
       //console.log(res.body);
       // assert.isNotEmpty(res.body.results);
@@ -116,7 +117,7 @@ describe('Match and Merge', () => {
       collectorAt: '/com.marklogic.smart-mastering/collector.xqy',
       optionsName: 'org-merge-options'
     }
-    return matchMerge.run(options)
+    return client.matchMerge.run(options)
     .then((res) => {
       console.log(res.body);
       // assert.isNotEmpty(res.body.results);
@@ -128,7 +129,7 @@ describe('Match and Merge', () => {
       optionsName: 'merge-options-xml',
       query: testQuery
     }
-    return matchMerge.run(options)
+    return client.matchMerge.run(options)
     .then((res) => {
       console.log(res);
       // assert.isNotEmpty(res.body.results);
