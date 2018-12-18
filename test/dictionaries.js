@@ -13,16 +13,66 @@ let client = sm.createClient({
   password: 'admin'
 });
 
+let dictOptions = `
+{
+  "options": {
+    "dataFormat": "json",
+    "propertyDefs": {
+      "property": [{ "namespace": "", "localname": "foo", "name": "foo" }]
+    },
+    "algorithms": {
+      "algorithm": [
+        {
+         "name": "dbl-metaphone",
+         "namespace": "http://marklogic.com/smart-mastering/algorithms",
+         "function": "double-metaphone",
+         "at": "/com.marklogic.smart-mastering/algorithms/double-metaphone.xqy"
+        }
+      ]
+    },
+    "scoring": {
+      "add": [],
+      "expand": [
+        {
+         "propertyName": "foo",
+         "algorithmRef": "dbl-metaphone",
+         "weight": "2",
+         "dictionary": "/mdm/config/dictionaries/foo-dict.xml",
+         "distance-threshold": 20,
+         "collation": "http://marklogic.com/collation/codepoint"
+        }
+      ]
+    },
+    "actions": {},
+    "thresholds": {
+      "threshold": []
+    }
+  }
+}
+`;
+
 before((done) => {
-  // Create dictionaries
-  done();
+  client.matchOptions.write('options-with-dict', dictOptions)
+  .then((res) => {
+    done();
+  });
+});
+
+after((done) => {
+  client.mlClient.documents.remove([
+    '/mdm/config/dictionaries/foo-dict.xml',
+    '/com.marklogic.smart-mastering/options/algorithms/options-with-dict.xml'
+  ])
+  .result((res) => {
+    done();
+  });
 });
 
 describe('Dictionaries', () => {
-  xit('should be listed', () => {
+  it('should be listed', () => {
     return client.dictionaries.list()
     .then((res) => {
-      // TODO
+      assert.isOk(res['availableDictionaries']['/mdm/config/dictionaries/foo-dict.xml']);
     })
   });
 });
