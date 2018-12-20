@@ -76,24 +76,15 @@ describe('Match Options', () => {
   it('should be read from the database', () => {
     return client.matchOptions.read('match-options-xml')
     .then((res) => {
-      let opts;
-      if (res.body) {
-        // options written as XML come back as JSON
-        opts = JSON.parse(res.body);
-      }
-      assert.isOk(res.body);
-      assert.isOk(opts.options);
+      // XML options are returned as JSON
+      assert.isOk(res.options);
     });
   });
   it('should be listed from the database', () => {
     return client.matchOptions.list()
     .then((res) => {
-      let opts;
-      if (res.body) {
-        opts = JSON.parse(res.body);
-      }
-      assert.isOk(res.body);
-      assert.equal(opts[0], 'match-options-json');
+      assert.isOk(res);
+      assert.equal(res[0], 'match-options-json');
     });
   });
   it('should be removed from the database JSON', () => {

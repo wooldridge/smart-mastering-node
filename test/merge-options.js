@@ -66,24 +66,14 @@ describe('Merge Options', () => {
   it('should be read from the database', () => {
     return client.mergeOptions.read('merge-options-xml')
     .then((res) => {
-      let opts;
-      if (res.body) {
-        // options written as XML come back as JSON
-        opts = JSON.parse(res.body);
-      }
-      assert.isOk(res.body);
-      assert.isOk(opts.options);
+      assert.isOk(res.options);
     });
   });
   it('should be listed from the database', () => {
     return client.mergeOptions.list()
     .then((res) => {
-      let opts;
-      if (res.body) {
-        opts = JSON.parse(res.body);
-      }
-      assert.isOk(res.body);
-      assert.equal(opts[0], 'merge-options-json');
+      assert.isOk(res);
+      assert.equal(res[0], 'merge-options-json');
     });
   });
   it('should be removed from the database JSON', () => {

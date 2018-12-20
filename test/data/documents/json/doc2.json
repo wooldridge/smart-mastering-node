@@ -1,34 +1,21 @@
 {
   "envelope": {
     "attachments": {
-      "envelope": {
-        "attachments": null,
-        "headers": {},
-        "instance": {
-          "addr": "1 A St.",
-          "fname": "Michael",
-          "id": "2",
-          "lname": "Smith",
-          "state": "NV",
-          "ts": "2018-04-26T16:32:00.0000Z",
-          "zip": "90001"
-        },
-        "triples": []
+      "test": {
+          "prop1": "foo",
+          "prop2": "bar",
+          "prop3": "blah"
       }
     },
     "headers": {},
     "instance": {
-      "Person": {
-        "addr": "1 A St.",
-        "fname": "Michael",
-        "id": "2",
-        "lname": "Smith",
-        "state": "NV",
-        "ts": "2018-04-26T16:32:00.0000Z",
-        "zip": "90001"
+      "test": {
+          "prop1": "foo",
+          "prop2": "bar",
+          "prop3": "blah"
       },
       "info": {
-        "title": "Person",
+        "title": "test",
         "version": "0.0.1"
       }
     },

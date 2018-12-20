@@ -1,16 +1,24 @@
 {
   "envelope": {
-    "headers": {},
-    "triples": [],
-    "instance": {
-      "id": "3",
-      "fname": "John",
-      "lname": "Doe",
-      "addr": "3 C St.",
-      "state": "WA",
-      "zip": "90000-1234",
-      "ts": "2018-04-26T16:33:00.0000Z"
+    "attachments": {
+      "test": {
+          "prop1": "foo",
+          "prop2": "bleh",
+          "prop3": "blah"
+      }
     },
-    "attachments": []
+    "headers": {},
+    "instance": {
+      "test": {
+          "prop1": "foo",
+          "prop2": "bleh",
+          "prop3": "blah"
+      },
+      "info": {
+        "title": "test",
+        "version": "0.0.1"
+      }
+    },
+    "triples": []
   }
 }

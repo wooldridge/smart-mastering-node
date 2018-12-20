@@ -1,16 +1,24 @@
 {
   "envelope": {
-    "headers": {},
-    "triples": [],
-    "instance": {
-      "id": "4",
-      "fname": "Mike",
-      "lname": "Wooldridge",
-      "addr": "1 A St.",
-      "state": "CA",
-      "zip": "90003",
-      "ts": "2018-04-26T16:34:00.0000Z"
+    "attachments": {
+      "test": {
+          "prop1": "blam",
+          "prop2": "bleh",
+          "prop3": "blah"
+      }
     },
-    "attachments": []
+    "headers": {},
+    "instance": {
+      "test": {
+          "prop1": "blam",
+          "prop2": "bleh",
+          "prop3": "blah"
+      },
+      "info": {
+        "title": "test",
+        "version": "0.0.1"
+      }
+    },
+    "triples": []
   }
 }
