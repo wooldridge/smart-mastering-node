@@ -17,27 +17,32 @@ describe('Match Blocks', () => {
   it('should be written to database', () => {
     return client.matchBlocks.write('doc1.json', 'doc2.json')
     .then((res) => {
-      assert.equal(res.statusCode, 204);
+      assert.equal(res, true);
     })
   });
   it('should be read from the database', () => {
     return client.matchBlocks.read('doc1.json')
     .then((res) => {
-      let blocks;
-      if (res.body) {
-        blocks = JSON.parse(res.body);
-      }
-      assert.isOk(res.body);
-      assert.equal(blocks.length, 1);
+      assert.isOk(res);
+      assert.equal(res[0], 'doc2.json');
     });
   });
-  // Skip since is failing
-  // https://github.com/marklogic-community/smart-mastering-core/issues/263
-  xit('should be removed from the database', () => {
+  it('should be removed from the database', () => {
     return client.matchBlocks.remove('doc1.json', 'doc2.json')
     .then((res) => {
-      // console.log(res);
-      // check something
+      assert.equal(res, true);
+    });
+  });
+  it('should be read and be empty after removal', () => {
+    return client.matchBlocks.read('doc1.json')
+    .then((res) => {
+      assert.equal(res.length, 0);
+    });
+  });
+  it('should not be removed after removal', () => {
+    return client.matchBlocks.remove('doc1.json', 'doc2.json')
+    .then((res) => {
+      assert.equal(res, false);
     });
   });
 });
