@@ -1,6 +1,7 @@
 const config = require('../config'),
       chai = require('chai'),
       marklogic = require('marklogic'),
+      moment = require('moment'),
       sm = require('../lib/sm'),
       fs = require('fs');
 
@@ -38,39 +39,151 @@ const path = config.path + 'test/data/documents/json/';
 //   }
 // ]
 
+// const docs = [
+//   {
+//     uri: 'org1.json',
+//     content: fs.readFileSync(path + 'org1.json'),
+//     collections: ['mdm-content', 'Source1']
+//   },
+//   {
+//     uri: 'orgA.json',
+//     content: fs.readFileSync(path + 'orgA.json'),
+//     collections: ['mdm-content', 'Source2']
+//   }
+// ]
+
 // before((done) => {
 //   client.mlClient.documents.write(docs)
 //   .result((res) => {
-//     return client.matchOptions.write('test-match-options', testMatchOptionsXML);
+//     return client.matchOptions.write('org-match-options', orgMatchOptionsXML);
 //   })
 //   .then((res) => {
-//     return client.mergeOptions.write('test-merge-options', testMergeOptionsXML);
+//     return client.mergeOptions.write('org-merge-options', orgMergeOptionsXML);
 //   })
 //   .then((res) => {
 //     done();
 //   });
 // });
 
-const docs = [
-  {
-    uri: 'org1.json',
-    content: fs.readFileSync(path + 'org1.json'),
-    collections: ['mdm-content', 'Source1']
-  },
-  {
-    uri: 'orgA.json',
-    content: fs.readFileSync(path + 'orgA.json'),
-    collections: ['mdm-content', 'Source2']
+
+let props = [['foo', 'bar', 'baz'],['foo', 'bar', 'bla'],
+             ['foo', 'ble', 'bla'],['blo', 'ble', 'bla']];
+
+let ids = [ '3de1a1f9-9df6-46c4-ad47-effaec802582',
+            '4de1a1f9-9df6-46c4-ad47-effaec802582',
+            '5de1a1f9-9df6-46c4-ad47-effaec802582',
+            '6de1a1f9-9df6-46c4-ad47-effaec802582' ];
+
+let docs = props.map(function(p, i) {
+  let content = {
+    envelope: {
+      instance: {
+        test: {
+            prop1: p[0],
+            prop2: p[1],
+            prop3: p[2]
+        },
+        info: { title: 'test', version: '0.0.1' }
+      },
+      headers: {
+        id: ids[i],
+        sources: [
+          {
+            name: '/test/source' + ((i % 2) + 1) +
+              '/match-merge-doc' + (i+1) + '.json',
+            dateTime: moment().add(i, 'days').format(),
+            user: "mdm-rest-admin"
+          }
+      ]
+      },
+      triples: [],
+      attachments: {
+        test: {
+            prop1: p[0],
+            prop2: p[1],
+            prop3: p[2]
+        }
+      }
+    }
+  };
+  return {
+    uri: '/match-merge-doc' + (i+1) + '.json',
+    collections: ['mdm-content', 'source' + (i + 1)],
+    content: content
+  };
+});
+
+let optionsMatch = {
+  options: {
+    dataFormat: "json",
+    propertyDefs: {
+      property: [
+        { namespace: "", localname: "prop1", name: "prop1" },
+        { namespace: "", localname: "prop2", name: "prop2" },
+        { namespace: "", localname: "prop3", name: "prop3" }
+      ]
+    },
+    algorithms: {},
+    scoring: {
+      add: [
+        { propertyName: "prop1", weight: "4" },
+        { propertyName: "prop2", weight: "2" },
+        { propertyName: "prop3", weight: "1" }
+      ],
+      expand: [],
+      reduce: []
+    },
+    actions: {},
+    thresholds: {
+      threshold: [
+        { above: "1", label: "Possible Match" },
+        { above: "3", label: "Likely Match", action: "notify" },
+        { above: "5", label: "Definitive Match", action: "merge" }
+      ]
+    },
+    tuning: { maxScan: "200" }
   }
-]
+}
+optionsMatch = JSON.stringify(optionsMatch);
+
+let optionsMerge = {
+  options: {
+    matchOptions: "match-options",
+    propertyDefs: {
+      properties: [
+        { namespace: "", localname: "prop1", name: "prop1" },
+        { namespace: "", localname: "prop2", name: "prop2" }
+      ]
+    },
+    merging: [
+      {
+        propertyName: "prop1",
+        maxValues: "1",
+        sourceWeights: [
+          { source: { name: "source1", weight: "10" } },
+          { source: { name: "source2", weight: "100" } }
+        ]
+      },
+      {
+        propertyName: "prop2",
+        maxValues: "1",
+        sourceWeights: [
+          { source: { name: "source1", weight: "100" } },
+          { source: { name: "source2", weight: "10" } }
+        ]
+      }
+    ]
+  }
+};
+optionsMerge = JSON.stringify(optionsMerge);
 
 before((done) => {
   client.mlClient.documents.write(docs)
   .result((res) => {
-    return client.matchOptions.write('org-match-options', orgMatchOptionsXML);
+    return client.matchOptions.write('match-options', optionsMatch);
   })
   .then((res) => {
-    return client.mergeOptions.write('org-merge-options', orgMergeOptionsXML);
+    return client.mergeOptions.write('merge-options', optionsMerge);
   })
   .then((res) => {
     done();
@@ -88,10 +201,10 @@ before((done) => {
 // });
 
 describe('Match and Merge', () => {
-  xit('should be run with URIs', () => {
+  it('should be run with URIs', () => {
     let options = {
-      uris: ['doc1.json', 'doc2.json'],
-      optionsName: 'test-merge-options'
+      uris: ['/match-merge-doc1.json', '/match-merge-doc2.json'],
+      optionsName: 'merge-options'
     }
     return client.matchMerge.run(options)
     .then((res) => {
@@ -99,14 +212,14 @@ describe('Match and Merge', () => {
       // assert.isNotEmpty(res.body.results);
     })
   });
-  it('should be run with URIs', () => {
+  xit('should be run with URIs', () => {
     let options = {
       uris: ['org1.json', 'orgA.json'],
       optionsName: 'org-merge-options'
     }
     return client.matchMerge.run(options)
     .then((res) => {
-      //console.log(res.body);
+      console.log(res);
       // assert.isNotEmpty(res.body.results);
     })
   });
