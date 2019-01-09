@@ -159,7 +159,6 @@ describe('Merge', () => {
     })
   });
   xit('should be run with options content JSON previewed', () => {
-    console.log('optionsJSON', optionsJSON);
     let options = {
       uris: ['/merge-doc1.json', '/merge-doc2.json'],
       mergeOptions: optionsJSON,
@@ -173,6 +172,21 @@ describe('Merge', () => {
       let inst = res.envelope.instance;
       assert.equal(inst.test.prop1, 'foo2');
       assert.equal(inst.test.prop2, 'bar1');
+    })
+  });
+  it('should be run with options content XML previewed', () => {
+    let options = {
+      uris: ['/merge-doc1.json', '/merge-doc2.json'],
+      mergeOptions: optionsXML,
+      preview: true
+    }
+    return client.merge.run(options)
+    .then((res) => {
+      let srcs = res.envelope.headers.sources;
+      assert.equal(srcs[0].name, 'source1');
+      let inst = res.envelope.instance;
+      assert.equal(inst.test.prop1, 'foo1');
+      assert.equal(inst.test.prop2, 'bar2');
     })
   });
   it('should be run with options ref XML merged', () => {
