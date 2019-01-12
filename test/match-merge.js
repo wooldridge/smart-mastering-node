@@ -17,62 +17,11 @@ let client = sm.createClient({
   password: 'admin'
 });
 
-const orgMatchOptionsXML = fs.readFileSync(config.path + 'test/data/options/org-match-options.xml').toString('utf8');
-const orgMergeOptionsXML = fs.readFileSync(config.path + 'test/data/options/org-merge-options.xml').toString('utf8');
-const testMatchOptionsJSON = fs.readFileSync(config.path + 'test/data/options/test-match-options.json').toString('utf8');
-const testMergeOptionsJSON = fs.readFileSync(config.path + 'test/data/options/test-merge-options.json').toString('utf8');
-const testMatchOptionsXML = fs.readFileSync(config.path + 'test/data/options/test-match-options.xml').toString('utf8');
-const testMergeOptionsXML = fs.readFileSync(config.path + 'test/data/options/test-merge-options.xml').toString('utf8');
-//const testQuery = fs.readFileSync(config.path + 'test-query.xqy').toString('utf8');
+// TODO move sample data creation to utility functions that can
+// be used by all tests.
 
-const path = config.path + 'test/data/documents/json/';
-// const docs = [
-//   {
-//     uri: 'doc1.json',
-//     content: fs.readFileSync(path + 'doc2.json'),
-//     collections: ['mdm-content', 'Source1']
-//   },
-//   {
-//     uri: 'doc2.json',
-//     content: fs.readFileSync(path + 'doc2.json'),
-//     collections: ['mdm-content', 'Source2']
-//   }
-// ]
-
-// const docs = [
-//   {
-//     uri: 'org1.json',
-//     content: fs.readFileSync(path + 'org1.json'),
-//     collections: ['mdm-content', 'Source1']
-//   },
-//   {
-//     uri: 'orgA.json',
-//     content: fs.readFileSync(path + 'orgA.json'),
-//     collections: ['mdm-content', 'Source2']
-//   }
-// ]
-
-// before((done) => {
-//   client.mlClient.documents.write(docs)
-//   .result((res) => {
-//     return client.matchOptions.write('org-match-options', orgMatchOptionsXML);
-//   })
-//   .then((res) => {
-//     return client.mergeOptions.write('org-merge-options', orgMergeOptionsXML);
-//   })
-//   .then((res) => {
-//     done();
-//   });
-// });
-
-
-let props = [['foo', 'bar', 'baz'],['foo', 'bar', 'bla'],
-             ['foo', 'ble', 'bla'],['blo', 'ble', 'bla']];
-
-let ids = [ '3de1a1f9-9df6-46c4-ad47-effaec802582',
-            '4de1a1f9-9df6-46c4-ad47-effaec802582',
-            '5de1a1f9-9df6-46c4-ad47-effaec802582',
-            '6de1a1f9-9df6-46c4-ad47-effaec802582' ];
+let props = [['foo', 'bar', 'baz'],['foo', 'bar', 'bla']];//,
+             //['foo', 'ble', 'bla'],['blo', 'ble', 'bla']];
 
 let docs = props.map(function(p, i) {
   let content = {
@@ -86,11 +35,11 @@ let docs = props.map(function(p, i) {
         info: { title: 'test', version: '0.0.1' }
       },
       headers: {
-        id: ids[i],
+        id: i,
         sources: [
           {
             name: '/test/source' + ((i % 2) + 1) +
-              '/match-merge-doc' + (i+1) + '.json',
+              '/doc' + (i+1) + '.json',
             dateTime: moment().add(i, 'days').format(),
             user: "mdm-rest-admin"
           }
@@ -107,7 +56,7 @@ let docs = props.map(function(p, i) {
     }
   };
   return {
-    uri: '/match-merge-doc' + (i+1) + '.json',
+    uri: '/doc' + (i+1) + '.json',
     collections: ['mdm-content', 'source' + (i + 1)],
     content: content
   };
@@ -152,7 +101,7 @@ let optionsMerge = {
     propertyDefs: {
       properties: [
         { namespace: "", localname: "prop1", name: "prop1" },
-        { namespace: "", localname: "prop2", name: "prop2" }
+        { namespace: "", localname: "prop3", name: "prop3" }
       ]
     },
     merging: [
@@ -165,11 +114,11 @@ let optionsMerge = {
         ]
       },
       {
-        propertyName: "prop2",
+        propertyName: "prop3",
         maxValues: "1",
         sourceWeights: [
-          { source: { name: "source1", weight: "100" } },
-          { source: { name: "source2", weight: "10" } }
+          { source: { name: "source1", weight: "10" } },
+          { source: { name: "source2", weight: "100" } }
         ]
       }
     ]
@@ -177,11 +126,29 @@ let optionsMerge = {
 };
 optionsMerge = JSON.stringify(optionsMerge);
 
+// Serializing queries as JSON:
+// https://docs.marklogic.com/guide/search-dev/cts_query#id_29308
+
+// Query that returns docs
+let queryMatches = {
+  wordQuery: {
+    text: ["foo"],
+    options: ["lang=en"]
+  }
+};
+queryMatches = JSON.stringify(queryMatches);
+
+// Query that doesn't return docs
+let queryNoMatches = {
+  wordQuery: {
+    text: ["nothing"],
+    options: ["lang=en"]
+  }
+};
+queryNoMatches = JSON.stringify(queryNoMatches);
+
 before((done) => {
-  client.mlClient.documents.write(docs)
-  .result((res) => {
-    return client.matchOptions.write('match-options', optionsMatch);
-  })
+  client.matchOptions.write('match-options', optionsMatch)
   .then((res) => {
     return client.mergeOptions.write('merge-options', optionsMerge);
   })
@@ -190,63 +157,93 @@ before((done) => {
   });
 });
 
-// after((done) => {
-//   client.mlClient.documents.remove(['docA.xml', 'docB.xml'])
-//   .result((res) => {
-//     return client.mergeOptions.remove('merge-options-xml');
-//   })
-//   .then((res) => {
-//     done();
-//   });
-// });
+beforeEach((done) => {
+  client.mlClient.documents.write(docs)
+  .result((res) => {
+    done();
+  });
+});
 
+after((done) => {
+  client.matchOptions.remove('match-options')
+  .then((res) => {
+    return client.mergeOptions.remove('merge-options');
+  })
+  .then((res) => {
+    done();
+  });
+});
+
+afterEach((done) => {
+  client.mlClient.documents.remove(docs.map((doc) => {return doc.uri}))
+  .result((res) => {
+    return client.mlClient.documents.removeAll({collection: 'mdm-auditing'});
+  })
+  .then((res) => {
+    return client.mlClient.documents.removeAll({collection: 'mdm-merged'});
+  })
+  .then((res) => {
+    done();
+  });
+});
+
+/**
+ * Note bug:
+ * https://github.com/marklogic-community/smart-mastering-core/issues/271
+ * When fixed, update to test merges and notifications together.
+ */
 describe('Match and Merge', () => {
-  // Returns error, details sent to ryanjdew 2019-01-08
-  xit('should be run with URIs', () => {
+  it('should be run with URIs', () => {
     let options = {
-      uris: ['/match-merge-doc1.json', '/match-merge-doc2.json'],
+      uris: ['/doc1.json', '/doc2.json'],
       optionsName: 'merge-options'
     }
     return client.matchMerge.run(options)
     .then((res) => {
-      console.log(res.body);
-      // assert.isNotEmpty(res.body.results);
-    })
+      assert.property(res, 'envelope');
+      let headers = res.envelope.headers;
+      assert.property(headers, 'sources');
+      assert.property(headers, 'merges');
+    });
   });
-  xit('should be run with URIs', () => {
-    let options = {
-      uris: ['org1.json', 'orgA.json'],
-      optionsName: 'org-merge-options'
-    }
-    return client.matchMerge.run(options)
-    .then((res) => {
-      console.log(res);
-      // assert.isNotEmpty(res.body.results);
-    })
-  });
-  xit('should be run with a collector', () => {
+  it('should be run with a collector', () => {
     let options = {
       collectorName: 'collect',
       collectorNs: 'http://marklogic.com/smart-mastering/collector',
       collectorAt: '/com.marklogic.smart-mastering/collector.xqy',
-      optionsName: 'org-merge-options'
+      optionsName: 'merge-options'
     }
     return client.matchMerge.run(options)
     .then((res) => {
-      console.log(res.body);
-      // assert.isNotEmpty(res.body.results);
+      assert.property(res, 'envelope');
+      let headers = res.envelope.headers;
+      assert.property(headers, 'sources');
+      assert.property(headers, 'merges');
     })
   });
-  xit('should be run with a query', () => {
+  it('should be run with a query and return matches', () => {
     let options = {
-      uris: ['docA.xml', 'docB.xml'],
-      optionsName: 'merge-options-xml',
-      query: testQuery
+      uris: ['/doc1.json', '/doc2.json'],
+      optionsName: 'merge-options',
+      query: queryMatches
     }
     return client.matchMerge.run(options)
     .then((res) => {
-      console.log(res);
-      // assert.isNotEmpty(res.body.results);
+      assert.property(res, 'envelope');
+      let headers = res.envelope.headers;
+      assert.property(headers, 'sources');
+      assert.property(headers, 'merges');
+    })
+  });
+  it('should be run with a query and not return matches', () => {
+    let options = {
+      uris: ['/doc1.json', '/doc2.json'],
+      optionsName: 'merge-options',
+      query: queryNoMatches
+    }
+    return client.matchMerge.run(options)
+    .then((res) => {
+      assert.equal(res, undefined);
     })
   });
 });
