@@ -62,6 +62,8 @@ Statistics about Smart Mastering are returned:
 
 ## Running Tests
 
+Set up the Smart Mastering project's [minimal-project](https://github.com/marklogic-community/smart-mastering-core/tree/master/examples/minimal-project) example. The tests use the example's databases.
+
 From the project root, run the following:
 
 `npm test`
