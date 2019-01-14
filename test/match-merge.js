@@ -56,7 +56,7 @@ let docs = props.map(function(p, i) {
     }
   };
   return {
-    uri: '/match-merge-doc' + (i+1) + '.json',
+    uri: '/doc' + (i+1) + '.json',
     collections: ['mdm-content', 'source' + (i + 1)],
     content: content
   };
@@ -199,7 +199,7 @@ describe('Match and Merge', () => {
 
   it('should be run with URIs', () => {
     let options = {
-      uris: ['/match-merge-doc1.json', '/match-merge-doc2.json'],
+      uris: ['/doc1.json', '/doc2.json'],
       optionsName: 'merge-options'
     }
     return client.matchMerge.run(options)
@@ -229,7 +229,7 @@ describe('Match and Merge', () => {
 
   it('should be run with a query and return matches', () => {
     let options = {
-      uris: ['/match-merge-doc1.json', '/match-merge-doc2.json'],
+      uris: ['/doc1.json', '/doc2.json'],
       optionsName: 'merge-options',
       query: queryMatches
     }
@@ -244,7 +244,7 @@ describe('Match and Merge', () => {
 
   it('should be run with a query and not return matches', () => {
     let options = {
-      uris: ['/match-merge-doc1.json', '/match-merge-doc2.json'],
+      uris: ['/doc1.json', '/doc2.json'],
       optionsName: 'merge-options',
       query: queryNoMatches
     }

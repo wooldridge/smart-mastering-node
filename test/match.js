@@ -102,27 +102,31 @@ let optionsXML = `<options xmlns="http://marklogic.com/smart-mastering/matcher">
   </tuning>
 </options>`;
 
-before((done) => {
-  client.mlClient.documents.write(docs)
-  .result((res) => {
-    return client.matchOptions.write('matching-options-json', JSON.stringify(optionsJSON));
-  })
-  .then((res) => {
-    done();
-  });
-});
-
-after((done) => {
-  client.mlClient.documents.remove(docs.map((doc) => {return doc.uri}))
-  .result((res) => {
-    return client.matchOptions.remove('matching-options-json');
-  })
-  .then((res) => {
-    done();
-  });
-});
-
 describe('Match', () => {
+
+  before((done) => {
+    client.mlClient.documents.removeAll({collection: 'mdm-content'})
+    .result((res) => {
+      return client.mlClient.documents.write(docs);
+    })
+    .then((res) => {
+      return client.matchOptions.write('matching-options-json', JSON.stringify(optionsJSON));
+    })
+    .then((res) => {
+      done();
+    });
+  });
+
+  after((done) => {
+    client.mlClient.documents.remove(docs.map((doc) => {return doc.uri}))
+    .result((res) => {
+      return client.matchOptions.remove('matching-options-json');
+    })
+    .then((res) => {
+      done();
+    });
+  });
+
   it('should be run with document and options refs', () => {
     let opts = {
       uri: '/doc1.json',
@@ -135,6 +139,7 @@ describe('Match', () => {
       assert.equal(res[0].uri, '/doc2.json');
     })
   });
+
   it('should be run with document content and options ref', () => {
     let opts = {
       document: JSON.stringify(docs[3].content),
@@ -147,6 +152,7 @@ describe('Match', () => {
       assert.equal(res[0].uri, '/doc4.json');
     })
   });
+
   it('should be run with document ref and options content', () => {
     let opts = {
       uri: '/doc1.json',
@@ -159,6 +165,7 @@ describe('Match', () => {
       assert.equal(res[0].uri, '/doc2.json');
     })
   });
+
   it('should be run with page info', () => {
     let opts = {
       uri: '/doc1.json',
@@ -173,6 +180,7 @@ describe('Match', () => {
       assert.equal(res[0].uri, '/doc3.json');
     })
   });
+
   it('should be run with matches included', () => {
     let opts = {
       uri: '/doc1.json',
@@ -185,18 +193,21 @@ describe('Match', () => {
       assert.isNotEmpty(res[0].matches);
     })
   });
+
   it('should error when no document', () => {
     let opts = {
       optionsName: 'matching-options-json'
     }
     assert.throw(function() { client.match.run(opts) });
   });
+
   it('should error when no options', () => {
     let opts = {
       uri: '/doc1.json'
     }
     assert.throw(function() { client.match.run(opts) });
   });
+
   it('should error when document content is not JSON', () => {
     let opts = {
       document: '<xml>foo</xml>',
@@ -204,6 +215,7 @@ describe('Match', () => {
     }
     assert.throw(function() { client.match.run(opts) });
   });
+
   it('should error when options content is not JSON', () => {
     let opts = {
       uri: '/doc1.json',
@@ -211,4 +223,5 @@ describe('Match', () => {
     }
     assert.throw(function() { client.match.run(opts) });
   });
+
 });
