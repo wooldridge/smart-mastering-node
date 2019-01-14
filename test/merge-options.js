@@ -51,24 +51,28 @@ let testOptionsXML = `
 `;
 
 describe('Merge Options', () => {
+
   it('should be written to database as JSON', () => {
     return client.mergeOptions.write('merge-options-json', testOptionsJSON)
     .then((res) => {
       assert.equal(res.statusCode, 204);
     })
   });
+
   it('should be written to database as XML', () => {
     return client.mergeOptions.write('merge-options-xml', testOptionsXML)
     .then((res) => {
       assert.equal(res.statusCode, 204);
     })
   });
+
   it('should be read from the database', () => {
     return client.mergeOptions.read('merge-options-xml')
     .then((res) => {
       assert.isOk(res.options);
     });
   });
+
   it('should be listed from the database', () => {
     return client.mergeOptions.list()
     .then((res) => {
@@ -76,16 +80,19 @@ describe('Merge Options', () => {
       assert.equal(res[0], 'merge-options-json');
     });
   });
+
   it('should be removed from the database JSON', () => {
     return client.mergeOptions.remove('merge-options-json')
     .then((res) => {
       assert.equal(res, true);
     });
   });
+
   it('should be removed from the database XML', () => {
     return client.mergeOptions.remove('merge-options-xml')
     .then((res) => {
       assert.equal(res, true);
     });
   });
+
 });

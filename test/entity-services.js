@@ -13,16 +13,18 @@ let client = sm.createClient({
   password: 'admin'
 });
 
-before((done) => {
-  // Create entity services descriptors
-  done();
-});
-
 describe('Entity Services', () => {
+
+  before((done) => {
+    // Create entity services descriptors
+    done();
+  });
+
   xit('should list descriptors', () => {
     return client.entityServices.list()
     .then((res) => {
       // TODO
     })
   });
+
 });

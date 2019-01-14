@@ -14,18 +14,20 @@ let client = sm.createClient({
   password: 'admin'
 });
 
-before((done) => {
-  // Create notifications
-  done();
-});
-
 describe('Notifications', () => {
+
+  before((done) => {
+    // Create notifications
+    done();
+  });
+
   xit('should be listed', () => {
     return client.notifications.list()
     .then((res) => {
       // TODO
     })
   });
+
   xit('should be listed using extracts', () => {
     let opts = {
       extracts: { "firstName": "PersonFirstName" }
@@ -35,6 +37,7 @@ describe('Notifications', () => {
       // TODO
     })
   });
+
   xit('should be listed using paging', () => {
     let opts = {
       start: 2,
@@ -45,16 +48,19 @@ describe('Notifications', () => {
       // TODO
     })
   });
+
   xit('should be removed', () => {
     return client.notifications.remove('notif1')
     .then((res) => {
       // TODO
     })
   });
+
   xit('should be updated', () => {
     return client.notifications.remove(['notif2'], 'unread')
     .then((res) => {
       // TODO
     })
   });
+
 });

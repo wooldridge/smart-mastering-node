@@ -13,9 +13,10 @@ let client = sm.createClient({
   password: 'admin'
 });
 
-// TODO run operations that will create a testable history
-
 describe('History', () => {
+
+  // TODO run operations that will create a testable history
+
   xit('should be read for a document', () => {
     return client.history.read('docA.xml')
     .then((res) => {
@@ -23,6 +24,7 @@ describe('History', () => {
       // assert.isNotEmpty(res.body.results);
     })
   });
+
   xit('should be read for the properties of a document', () => {
     return client.history.readProps('docA.xml', ['PersonSurName', 'PersonGivenName'])
     .then((res) => {
@@ -30,4 +32,5 @@ describe('History', () => {
       // assert.isNotEmpty(res.body.results);
     })
   });
+
 });

@@ -56,7 +56,7 @@ let docs = props.map(function(p, i) {
     }
   };
   return {
-    uri: '/doc' + (i+1) + '.json',
+    uri: '/match-merge-doc' + (i+1) + '.json',
     collections: ['mdm-content', 'source' + (i + 1)],
     content: content
   };
@@ -147,55 +147,59 @@ let queryNoMatches = {
 };
 queryNoMatches = JSON.stringify(queryNoMatches);
 
-before((done) => {
-  client.matchOptions.write('match-options', optionsMatch)
-  .then((res) => {
-    return client.mergeOptions.write('merge-options', optionsMerge);
-  })
-  .then((res) => {
-    done();
-  });
-});
-
-beforeEach((done) => {
-  client.mlClient.documents.write(docs)
-  .result((res) => {
-    done();
-  });
-});
-
-after((done) => {
-  client.matchOptions.remove('match-options')
-  .then((res) => {
-    return client.mergeOptions.remove('merge-options');
-  })
-  .then((res) => {
-    done();
-  });
-});
-
-afterEach((done) => {
-  client.mlClient.documents.remove(docs.map((doc) => {return doc.uri}))
-  .result((res) => {
-    return client.mlClient.documents.removeAll({collection: 'mdm-auditing'});
-  })
-  .then((res) => {
-    return client.mlClient.documents.removeAll({collection: 'mdm-merged'});
-  })
-  .then((res) => {
-    done();
-  });
-});
-
 /**
  * Note bug:
  * https://github.com/marklogic-community/smart-mastering-core/issues/271
  * When fixed, update to test merges and notifications together.
  */
 describe('Match and Merge', () => {
+
+  before((done) => {
+    client.mlClient.documents.removeAll({collection: 'mdm-content'})
+    .result((res) => {
+      return client.matchOptions.write('match-options', optionsMatch);
+    })
+    .then((res) => {
+      return client.mergeOptions.write('merge-options', optionsMerge);
+    })
+    .then((res) => {
+      done();
+    });
+  });
+
+  beforeEach((done) => {
+    client.mlClient.documents.write(docs)
+    .result((res) => {
+      done();
+    });
+  });
+
+  after((done) => {
+    client.matchOptions.remove('match-options')
+    .then((res) => {
+      return client.mergeOptions.remove('merge-options');
+    })
+    .then((res) => {
+      done();
+    });
+  });
+
+  afterEach((done) => {
+    client.mlClient.documents.remove(docs.map((doc) => {return doc.uri}))
+    .result((res) => {
+      return client.mlClient.documents.removeAll({collection: 'mdm-auditing'});
+    })
+    .then((res) => {
+      return client.mlClient.documents.removeAll({collection: 'mdm-merged'});
+    })
+    .then((res) => {
+      done();
+    });
+  });
+
   it('should be run with URIs', () => {
     let options = {
-      uris: ['/doc1.json', '/doc2.json'],
+      uris: ['/match-merge-doc1.json', '/match-merge-doc2.json'],
       optionsName: 'merge-options'
     }
     return client.matchMerge.run(options)
@@ -206,6 +210,7 @@ describe('Match and Merge', () => {
       assert.property(headers, 'merges');
     });
   });
+
   it('should be run with a collector', () => {
     let options = {
       collectorName: 'collect',
@@ -221,9 +226,10 @@ describe('Match and Merge', () => {
       assert.property(headers, 'merges');
     })
   });
+
   it('should be run with a query and return matches', () => {
     let options = {
-      uris: ['/doc1.json', '/doc2.json'],
+      uris: ['/match-merge-doc1.json', '/match-merge-doc2.json'],
       optionsName: 'merge-options',
       query: queryMatches
     }
@@ -235,9 +241,10 @@ describe('Match and Merge', () => {
       assert.property(headers, 'merges');
     })
   });
+
   it('should be run with a query and not return matches', () => {
     let options = {
-      uris: ['/doc1.json', '/doc2.json'],
+      uris: ['/match-merge-doc1.json', '/match-merge-doc2.json'],
       optionsName: 'merge-options',
       query: queryNoMatches
     }
@@ -246,4 +253,5 @@ describe('Match and Merge', () => {
       assert.equal(res, undefined);
     })
   });
+
 });

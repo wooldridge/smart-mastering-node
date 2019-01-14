@@ -4,6 +4,7 @@ const chai = require('chai'),
 const assert = chai.assert;
 
 describe('Smart Mastering', () => {
+
   it('should create a client', () => {
     let client = sm.createClient({
       user: 'user',
@@ -11,6 +12,7 @@ describe('Smart Mastering', () => {
     })
     assert.equal(client.constructor.name, 'SmartMasteringClient');
   });
+
   it('should read stats', () => {
     let client = sm.createClient({
       host: 'localhost',
@@ -26,4 +28,5 @@ describe('Smart Mastering', () => {
       assert.isNumber(res.docCount);
     })
   });
+
 });

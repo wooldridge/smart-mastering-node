@@ -61,18 +61,21 @@ let testOptionsXML = `
 `;
 
 describe('Match Options', () => {
+
   it('should be written to database as JSON', () => {
     return client.matchOptions.write('match-options-json', testOptionsJSON)
     .then((res) => {
       assert.equal(res.statusCode, 204);
     })
   });
+
   it('should be written to database as XML', () => {
     return client.matchOptions.write('match-options-xml', testOptionsXML)
     .then((res) => {
       assert.equal(res.statusCode, 204);
     })
   });
+
   it('should be read from the database', () => {
     return client.matchOptions.read('match-options-xml')
     .then((res) => {
@@ -80,6 +83,7 @@ describe('Match Options', () => {
       assert.isOk(res.options);
     });
   });
+
   it('should be listed from the database', () => {
     return client.matchOptions.list()
     .then((res) => {
@@ -87,16 +91,19 @@ describe('Match Options', () => {
       assert.equal(res[0], 'match-options-json');
     });
   });
+
   it('should be removed from the database JSON', () => {
     return client.matchOptions.remove('match-options-json')
     .then((res) => {
       assert.equal(res, true);
     });
   });
+
   it('should be removed from the database XML', () => {
     return client.matchOptions.remove('match-options-xml')
     .then((res) => {
       assert.equal(res, true);
     });
   });
+
 });

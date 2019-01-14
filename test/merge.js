@@ -108,41 +108,42 @@ let optionsXML = `<?xml version="1.0" encoding="UTF-8"?>
 </options>
 `;
 
-before((done) => {
-  client.mlClient.documents.write(docs)
-  .result((res) => {
-    return client.mergeOptions.write('merging-options-json', optionsJSON);
-  })
-  .then((res) => {
-    return client.mergeOptions.write('merging-options-xml', optionsXML);
-  })
-  .then((res) => {
-    done();
-  });
-});
-
-after((done) => {
-  client.mlClient.documents.remove(['/merge-doc1.json', '/merge-doc2.json'])
-  .result((res) => {
-    return client.mergeOptions.remove('merging-options-json');
-  })
-  .then((res) => {
-    return client.mergeOptions.remove('merging-options-xml');
-  })
-  .then((res) => {
-    return client.mlClient.documents.removeAll({collection: 'mdm-auditing'});
-  })
-  .then((res) => {
-    return client.mlClient.documents.removeAll({collection: 'mdm-merged'});
-  })
-  .then((res) => {
-    done();
-  });
-});
-
 let uriToRestore = '';
 
 describe('Merge', () => {
+
+  before((done) => {
+    client.mlClient.documents.write(docs)
+    .result((res) => {
+      return client.mergeOptions.write('merging-options-json', optionsJSON);
+    })
+    .then((res) => {
+      return client.mergeOptions.write('merging-options-xml', optionsXML);
+    })
+    .then((res) => {
+      done();
+    });
+  });
+
+  after((done) => {
+    client.mlClient.documents.remove(['/merge-doc1.json', '/merge-doc2.json'])
+    .result((res) => {
+      return client.mergeOptions.remove('merging-options-json');
+    })
+    .then((res) => {
+      return client.mergeOptions.remove('merging-options-xml');
+    })
+    .then((res) => {
+      return client.mlClient.documents.removeAll({collection: 'mdm-auditing'});
+    })
+    .then((res) => {
+      return client.mlClient.documents.removeAll({collection: 'mdm-merged'});
+    })
+    .then((res) => {
+      done();
+    });
+  });
+
   it('should be run with options ref JSON previewed', () => {
     let options = {
       uris: ['/merge-doc1.json', '/merge-doc2.json'],
@@ -158,6 +159,7 @@ describe('Merge', () => {
       assert.equal(inst.test.prop2, 'bar1');
     })
   });
+
   xit('should be run with options content JSON previewed', () => {
     let options = {
       uris: ['/merge-doc1.json', '/merge-doc2.json'],
@@ -174,6 +176,7 @@ describe('Merge', () => {
       assert.equal(inst.test.prop2, 'bar1');
     })
   });
+
   it('should be run with options content XML previewed', () => {
     let options = {
       uris: ['/merge-doc1.json', '/merge-doc2.json'],
@@ -189,6 +192,7 @@ describe('Merge', () => {
       assert.equal(inst.test.prop2, 'bar2');
     })
   });
+
   it('should be run with options ref XML merged', () => {
     let options = {
       uris: ['/merge-doc1.json', '/merge-doc2.json'],
@@ -205,6 +209,7 @@ describe('Merge', () => {
       uriToRestore = res.envelope.headers.id;
     })
   });
+
   // The following returns success but doesn't seem to do anything
   xit('should be restored', () => {
     return client.merge.restore(uriToRestore, false)
@@ -212,4 +217,5 @@ describe('Merge', () => {
       console.log(res);
     })
   });
+
 });

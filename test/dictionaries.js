@@ -51,28 +51,30 @@ let dictOptions = `
 }
 `;
 
-before((done) => {
-  client.matchOptions.write('options-with-dict', dictOptions)
-  .then((res) => {
-    done();
-  });
-});
-
-after((done) => {
-  client.mlClient.documents.remove([
-    '/mdm/config/dictionaries/foo-dict.xml',
-    '/com.marklogic.smart-mastering/options/algorithms/options-with-dict.xml'
-  ])
-  .result((res) => {
-    done();
-  });
-});
-
 describe('Dictionaries', () => {
+
+  before((done) => {
+    client.matchOptions.write('options-with-dict', dictOptions)
+    .then((res) => {
+      done();
+    });
+  });
+
+  after((done) => {
+    client.mlClient.documents.remove([
+      '/mdm/config/dictionaries/foo-dict.xml',
+      '/com.marklogic.smart-mastering/options/algorithms/options-with-dict.xml'
+    ])
+    .result((res) => {
+      done();
+    });
+  });
+
   it('should be listed', () => {
     return client.dictionaries.list()
     .then((res) => {
       assert.isOk(res['availableDictionaries']['/mdm/config/dictionaries/foo-dict.xml']);
     })
   });
+
 });
