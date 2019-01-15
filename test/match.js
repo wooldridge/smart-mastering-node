@@ -47,11 +47,11 @@ let docs = props.map(function(p, i) {
   };
 });
 
-let optionsJSON = sm.createMatchOptions();
-optionsJSON.exact({ propertyName: 'prop1', weight: 4 })
+let optionsJSON = sm.createMatchOptions()
+  .exact({ propertyName: 'prop1', weight: 4 })
   .exact({ propertyName: 'prop2', weight: 2 })
-  .exact({ propertyName: 'prop3', weight: 1 });
-optionsJSON.threshold({ above: 1, label: 'Possible Match' })
+  .exact({ propertyName: 'prop3', weight: 1 })
+  .threshold({ above: 1, label: 'Possible Match' })
   .threshold({ above: 3, label: 'Likely Match', action: 'notify' })
   .threshold({ above: 5, label: 'Definitive Match', action: 'merge' });
 

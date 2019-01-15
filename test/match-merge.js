@@ -62,8 +62,8 @@ let docs = props.map(function(p, i) {
   };
 });
 
-let optionsMatch = sm.createMatchOptions();
-optionsMatch.exact({ propertyName: 'prop1', weight: 4 })
+let optionsMatch = sm.createMatchOptions()
+  .exact({ propertyName: 'prop1', weight: 4 })
   .exact({ propertyName: 'prop2', weight: 2 })
   .exact({ propertyName: 'prop3', weight: 1 })
   .threshold({ above: 1, label: 'Possible Match' })
