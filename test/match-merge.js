@@ -62,37 +62,14 @@ let docs = props.map(function(p, i) {
   };
 });
 
-let optionsMatch = {
-  options: {
-    dataFormat: "json",
-    propertyDefs: {
-      property: [
-        { namespace: "", localname: "prop1", name: "prop1" },
-        { namespace: "", localname: "prop2", name: "prop2" },
-        { namespace: "", localname: "prop3", name: "prop3" }
-      ]
-    },
-    algorithms: {},
-    scoring: {
-      add: [
-        { propertyName: "prop1", weight: "4" },
-        { propertyName: "prop2", weight: "2" },
-        { propertyName: "prop3", weight: "1" }
-      ],
-      expand: [],
-      reduce: []
-    },
-    actions: {},
-    thresholds: {
-      threshold: [
-        { above: "1", label: "Possible Match" },
-        { above: "3", label: "Likely Match", action: "notify" },
-        { above: "5", label: "Definitive Match", action: "merge" }
-      ]
-    },
-    tuning: { maxScan: "200" }
-  }
-}
+let optionsMatch = sm.createMatchOptions();
+optionsMatch.exact({ propertyName: 'prop1', weight: 4 })
+  .exact({ propertyName: 'prop2', weight: 2 })
+  .exact({ propertyName: 'prop3', weight: 1 })
+  .threshold({ above: 1, label: 'Possible Match' })
+  .threshold({ above: 3, label: 'Likely Match', action: 'notify' })
+  .threshold({ above: 5, label: 'Definitive Match', action: 'merge' });
+
 optionsMatch = JSON.stringify(optionsMatch);
 
 let optionsMerge = {
