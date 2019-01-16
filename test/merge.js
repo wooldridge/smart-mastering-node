@@ -55,34 +55,21 @@ let docs = props.map(function(p, i) {
   };
 });
 
-let optionsJSON = {
-  options: {
-    propertyDefs: {
-      properties: [
-        { namespace: "", localname: "prop1", name: "prop1" },
-        { namespace: "", localname: "prop2", name: "prop2" }
-      ]
-    },
-    merging: [
-      {
-        propertyName: "prop1",
-        maxValues: "1",
-        sourceWeights: [
-          { source: { name: "source1", weight: "10" } },
-          { source: { name: "source2", weight: "100" } }
-        ]
-      },
-      {
-        propertyName: "prop2",
-        maxValues: "1",
-        sourceWeights: [
-          { source: { name: "source1", weight: "100" } },
-          { source: { name: "source2", weight: "10" } }
-        ]
-      }
-    ]
-  }
-};
+let optionsJSON = sm.createMergeOptions();
+optionsJSON.merge({
+    propertyName: 'prop1',
+    maxValues: 1,
+    sourceWeights: [
+      optionsJSON.sourceWeight("source1", 10),
+      optionsJSON.sourceWeight("source2", 100),
+    ] })
+  .merge({
+    propertyName: 'prop2',
+    maxValues: 1,
+    sourceWeights: [
+      optionsJSON.sourceWeight("source1", 100),
+      optionsJSON.sourceWeight("source2", 10),
+    ] });
 optionsJSON = JSON.stringify(optionsJSON);
 
 let optionsXML = `<?xml version="1.0" encoding="UTF-8"?>
