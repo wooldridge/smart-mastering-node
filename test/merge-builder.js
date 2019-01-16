@@ -11,6 +11,11 @@ describe('Merge Builder', () => {
     mergeOptions = sm.createMergeOptions();
   });
 
+  it('should define a match options', () => {
+    mergeOptions.matchOptions('test');
+    assert.deepEqual(mergeOptions.options.matchOptions, 'test');
+  });
+
   it('should define a timestamp', () => {
     mergeOptions.timestamp('/a/path/to/the/timestamp');
     assert.deepEqual(mergeOptions.options.algorithms.stdAlgorithm.timestamp,
