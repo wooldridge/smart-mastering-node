@@ -72,35 +72,23 @@ let optionsMatch = sm.createMatchOptions()
 
 optionsMatch = JSON.stringify(optionsMatch);
 
-let optionsMerge = {
-  options: {
-    matchOptions: "match-options",
-    propertyDefs: {
-      properties: [
-        { namespace: "", localname: "prop1", name: "prop1" },
-        { namespace: "", localname: "prop3", name: "prop3" }
-      ]
-    },
-    merging: [
-      {
-        propertyName: "prop1",
-        maxValues: "1",
-        sourceWeights: [
-          { source: { name: "source1", weight: "10" } },
-          { source: { name: "source2", weight: "100" } }
-        ]
-      },
-      {
-        propertyName: "prop3",
-        maxValues: "1",
-        sourceWeights: [
-          { source: { name: "source1", weight: "10" } },
-          { source: { name: "source2", weight: "100" } }
-        ]
-      }
-    ]
-  }
-};
+let optionsMerge = sm.createMergeOptions();
+optionsMerge.matchOptions('match-options');
+optionsMerge.merge({
+    propertyName: 'prop1',
+    maxValues: 1,
+    sourceWeights: [
+      optionsMerge.sourceWeight("source1", 10),
+      optionsMerge.sourceWeight("source2", 100),
+    ] })
+  .merge({
+    propertyName: 'prop3',
+    maxValues: 1,
+    sourceWeights: [
+      optionsMerge.sourceWeight("source1", 100),
+      optionsMerge.sourceWeight("source2", 10),
+    ] });
+
 optionsMerge = JSON.stringify(optionsMerge);
 
 // Serializing queries as JSON:
