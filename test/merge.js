@@ -147,6 +147,16 @@ describe('Merge', () => {
     })
   });
 
+  // TODO erroring with the following:
+  // { errorResponse:
+   // { statusCode: 500,
+   //   status: 'Internal Server Error',
+   //   messageCode: 'INTERNAL ERROR',
+   //   message: 'XDMP-AS: (err:XPTY0004) $merge-options as item()? --
+   //   Invalid coercion: (object-node{"options":object-node{"matchOptions":text{""},
+   //   "propertyDefs":object-node{...}, ...}}, object-node{"matchOptions":text{""},
+   //   "propertyDefs":object-node{"properties":array-node{...}, ...}, ...}) as item()? .
+   //   See the MarkLogic server error log for further detail.' } }
   xit('should be run with options content JSON previewed', () => {
     let options = {
       uris: ['/merge-doc1.json', '/merge-doc2.json'],
