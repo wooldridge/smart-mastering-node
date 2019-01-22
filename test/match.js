@@ -1,5 +1,4 @@
-const config = require('../config'),
-      chai = require('chai'),
+const chai = require('chai'),
       sm = require('../lib/sm'),
       fs = require('fs');
 

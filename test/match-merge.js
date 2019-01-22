@@ -1,5 +1,4 @@
-const config = require('../config'),
-      chai = require('chai'),
+const chai = require('chai'),
       marklogic = require('marklogic'),
       moment = require('moment'),
       sm = require('../lib/sm'),
