@@ -28,68 +28,33 @@ let testDocs = testUtils.createDocuments([
   { 'prop1': 'faa', 'prop2': 'ble', 'prop3': 'bla' },
 ]);
 
-let optionsMatch = {
-  options: {
-    dataFormat: "json",
-    propertyDefs: {
-      property: [
-        { namespace: "", localname: "prop1", name: "prop1" },
-        { namespace: "", localname: "prop2", name: "prop2" },
-        { namespace: "", localname: "prop3", name: "prop3" }
-      ]
-    },
-    algorithms: {},
-    scoring: {
-      add: [
-        { propertyName: "prop1", weight: "4" },
-        { propertyName: "prop2", weight: "2" },
-        { propertyName: "prop3", weight: "1" }
-      ],
-      expand: [],
-      reduce: []
-    },
-    actions: {},
-    thresholds: {
-      threshold: [
-        { above: "1", label: "Possible Match" },
-        { above: "3", label: "Likely Match", action: "notify" },
-        { above: "5", label: "Definitive Match", action: "merge" }
-      ]
-    },
-    tuning: { maxScan: "200" }
-  }
-}
+let optionsMatch = sm.createMatchOptions()
+  .exact({ propertyName: 'prop1', weight: 4 })
+  .exact({ propertyName: 'prop2', weight: 2 })
+  .exact({ propertyName: 'prop3', weight: 1 })
+  .threshold({ above: 1, label: 'Possible Match' })
+  .threshold({ above: 3, label: 'Likely Match', action: 'notify' })
+  .threshold({ above: 5, label: 'Definitive Match', action: 'merge' });
+
 optionsMatch = JSON.stringify(optionsMatch);
 
-let optionsMerge = {
-  options: {
-    matchOptions: "match-options",
-    propertyDefs: {
-      properties: [
-        { namespace: "", localname: "prop1", name: "prop1" },
-        { namespace: "", localname: "prop3", name: "prop3" }
-      ]
-    },
-    merging: [
-      {
-        propertyName: "prop1",
-        maxValues: "1",
-        sourceWeights: [
-          { source: { name: "source1", weight: "10" } },
-          { source: { name: "source2", weight: "100" } }
-        ]
-      },
-      {
-        propertyName: "prop3",
-        maxValues: "1",
-        sourceWeights: [
-          { source: { name: "source1", weight: "10" } },
-          { source: { name: "source2", weight: "100" } }
-        ]
-      }
-    ]
-  }
-};
+let optionsMerge = sm.createMergeOptions();
+optionsMerge.matchOptions("match-options")
+  .merge({
+    propertyName: 'prop1',
+    maxValues: 1,
+    sourceWeights: [
+      optionsMerge.sourceWeight("source1", 10),
+      optionsMerge.sourceWeight("source2", 100),
+    ] })
+  .merge({
+    propertyName: 'prop3',
+    maxValues: 1,
+    sourceWeights: [
+      optionsMerge.sourceWeight("source1", 10),
+      optionsMerge.sourceWeight("source2", 100),
+    ] });
+
 optionsMerge = JSON.stringify(optionsMerge);
 
 let notificationURI = '';
