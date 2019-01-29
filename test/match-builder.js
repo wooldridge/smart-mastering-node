@@ -114,4 +114,10 @@ describe('Match Builder', () => {
       { above: 5, label: 'Likely Match', action: 'notify' });
   });
 
+  it('should define a property alias only once', () => {
+    matchOptions.exact({ propertyName: 'foo', weight: 10})
+      .exact({ propertyName: 'foo', weight: 100 });
+    assert.equal(matchOptions.options.propertyDefs.property.length, 1);
+  });
+
 });
