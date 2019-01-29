@@ -2,7 +2,8 @@ const chai = require('chai'),
       marklogic = require('marklogic'),
       moment = require('moment'),
       sm = require('../lib/sm'),
-      fs = require('fs');
+      fs = require('fs'),
+      testUtils = require('./test-utils');
 
 const assert = chai.assert;
 
@@ -16,50 +17,12 @@ let client = sm.createClient({
   password: 'admin'
 });
 
-// TODO move sample data creation to utility functions that can
-// be used by all tests.
-
-let props = [['foo', 'bar', 'baz'],['foo', 'bar', 'bla']];//,
-             //['foo', 'ble', 'bla'],['blo', 'ble', 'bla']];
-
-let docs = props.map(function(p, i) {
-  let content = {
-    envelope: {
-      instance: {
-        test: {
-            prop1: p[0],
-            prop2: p[1],
-            prop3: p[2]
-        },
-        info: { title: 'test', version: '0.0.1' }
-      },
-      headers: {
-        id: i,
-        sources: [
-          {
-            name: '/test/source' + ((i % 2) + 1) +
-              '/doc' + (i+1) + '.json',
-            dateTime: moment().add(i, 'days').format(),
-            user: "mdm-rest-admin"
-          }
-      ]
-      },
-      triples: [],
-      attachments: {
-        test: {
-            prop1: p[0],
-            prop2: p[1],
-            prop3: p[2]
-        }
-      }
-    }
-  };
-  return {
-    uri: '/doc' + (i+1) + '.json',
-    collections: ['mdm-content', 'source' + (i + 1)],
-    content: content
-  };
-});
+let testDocs = testUtils.createDocuments([
+  // /doc1.json
+  { 'prop1': 'foo', 'prop2': 'bar', 'prop3': 'baz' },
+  // /doc2.json
+  { 'prop1': 'foo', 'prop2': 'bar', 'prop3': 'bla' }
+]);
 
 let optionsMatch = sm.createMatchOptions()
   .exact({ propertyName: 'prop1', weight: 4 })
@@ -132,7 +95,7 @@ describe('Match and Merge', () => {
   });
 
   beforeEach((done) => {
-    client.mlClient.documents.write(docs)
+    client.mlClient.documents.write(testDocs)
     .result((res) => {
       done();
     });
@@ -149,7 +112,7 @@ describe('Match and Merge', () => {
   });
 
   afterEach((done) => {
-    client.mlClient.documents.remove(docs.map((doc) => {return doc.uri}))
+    client.mlClient.documents.remove(testDocs.map((doc) => {return doc.uri}))
     .result((res) => {
       return client.mlClient.documents.removeAll({collection: 'mdm-auditing'});
     })

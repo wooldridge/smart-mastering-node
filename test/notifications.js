@@ -2,7 +2,8 @@ const chai = require('chai'),
       moment = require('moment'),
       parseXML = require('xml2js').parseString,
       sm = require('../lib/sm'),
-      fs = require('fs');
+      fs = require('fs'),
+      testUtils = require('./test-utils');
 
 const assert = chai.assert;
 
@@ -16,47 +17,16 @@ let client = sm.createClient({
   password: 'admin'
 });
 
-let props = [['foo', 'bar', 'baz'], ['foo', 'blo', 'blu'],
-             ['faa', 'bor', 'boz'], ['faa', 'ble', 'bla']];
-
-let docs = props.map(function(p, i) {
-  let content = {
-    envelope: {
-      instance: {
-        test: {
-            prop1: p[0],
-            prop2: p[1],
-            prop3: p[2]
-        },
-        info: { title: 'test', version: '0.0.1' }
-      },
-      headers: {
-        id: i,
-        sources: [
-          {
-            name: '/test/source' + ((i % 2) + 1) +
-              '/doc' + (i+1) + '.json',
-            dateTime: moment().add(i, 'days').format(),
-            user: "mdm-rest-admin"
-          }
-      ]
-      },
-      triples: [],
-      attachments: {
-        test: {
-            prop1: p[0],
-            prop2: p[1],
-            prop3: p[2]
-        }
-      }
-    }
-  };
-  return {
-    uri: '/doc' + (i+1) + '.json',
-    collections: ['mdm-content', 'source' + (i + 1)],
-    content: content
-  };
-});
+let testDocs = testUtils.createDocuments([
+  // /doc1.json
+  { 'prop1': 'foo', 'prop2': 'bar', 'prop3': 'baz' },
+  // /doc2.json
+  { 'prop1': 'foo', 'prop2': 'blo', 'prop3': 'blu' },
+  // /doc3.json
+  { 'prop1': 'faa', 'prop2': 'bor', 'prop3': 'boz' },
+  // /doc4.json
+  { 'prop1': 'faa', 'prop2': 'ble', 'prop3': 'bla' },
+]);
 
 let optionsMatch = {
   options: {
@@ -132,7 +102,7 @@ describe('Notifications', () => {
       return client.mergeOptions.write('merge-options', optionsMerge);
     })
     .then((res) => {
-      return client.mlClient.documents.write(docs);
+      return client.mlClient.documents.write(testDocs);
     })
     .then((res) => {
       done();

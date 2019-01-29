@@ -1,6 +1,7 @@
 const chai = require('chai'),
       sm = require('../lib/sm'),
-      fs = require('fs');
+      fs = require('fs'),
+      testUtils = require('./test-utils');
 
 const assert = chai.assert;
 
@@ -14,37 +15,16 @@ let client = sm.createClient({
   password: 'admin'
 });
 
-let props = [['foo', 'bar', 'baz'],['foo', 'bar', 'bla'],
-             ['foo', 'ble', 'bla'],['blo', 'ble', 'bla']];
-
-let docs = props.map(function(p, i) {
-  let content = {
-    envelope: {
-      instance: {
-        test: {
-            prop1: p[0],
-            prop2: p[1],
-            prop3: p[2]
-        },
-        info: { title: 'test', version: '0.0.1' }
-      },
-      headers: {},
-      triples: [],
-      attachments: {
-        test: {
-            prop1: p[0],
-            prop2: p[1],
-            prop3: p[2]
-        }
-      }
-    }
-  };
-  return {
-    uri: '/doc' + (i+1) + '.json',
-    collections: ['mdm-content'],
-    content: content
-  };
-});
+let testDocs = testUtils.createDocuments([
+  // /doc1.json
+  { 'prop1': 'foo', 'prop2': 'bar', 'prop3': 'baz' },
+  // /doc2.json
+  { 'prop1': 'foo', 'prop2': 'bar', 'prop3': 'bla' },
+  // /doc3.json
+  { 'prop1': 'foo', 'prop2': 'ble', 'prop3': 'bla' },
+  // /doc4.json
+  { 'prop1': 'blo', 'prop2': 'ble', 'prop3': 'bla' },
+]);
 
 let optionsJSON = sm.createMatchOptions()
   .exact({ propertyName: 'prop1', weight: 4 })
@@ -82,7 +62,7 @@ describe('Match', () => {
   before((done) => {
     client.mlClient.documents.removeAll({collection: 'mdm-content'})
     .result((res) => {
-      return client.mlClient.documents.write(docs);
+      return client.mlClient.documents.write(testDocs);
     })
     .then((res) => {
       return client.matchOptions.write('matching-options-json', JSON.stringify(optionsJSON));
@@ -93,7 +73,7 @@ describe('Match', () => {
   });
 
   after((done) => {
-    client.mlClient.documents.remove(docs.map((doc) => {return doc.uri}))
+    client.mlClient.documents.remove(testDocs.map((doc) => {return doc.uri}))
     .result((res) => {
       return client.matchOptions.remove('matching-options-json');
     })
@@ -117,7 +97,7 @@ describe('Match', () => {
 
   it('should be run with document content and options ref', () => {
     let opts = {
-      document: JSON.stringify(docs[3].content),
+      document: JSON.stringify(testDocs[3].content),
       optionsName: 'matching-options-json'
     }
     return client.match.run(opts)

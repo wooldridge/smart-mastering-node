@@ -1,7 +1,8 @@
 const chai = require('chai'),
       moment = require('moment'),
       sm = require('../lib/sm'),
-      fs = require('fs');
+      fs = require('fs'),
+      testUtils = require('./test-utils');
 
 const assert = chai.assert;
 
@@ -15,45 +16,12 @@ let client = sm.createClient({
   password: 'admin'
 });
 
-let props = [['foo1', 'bar1'],['foo2', 'bar2']];
-
-let docs = props.map(function(p, i) {
-  let content = {
-    envelope: {
-      instance: {
-        test: {
-            prop1: p[0],
-            prop2: p[1],
-            prop3: p[2]
-        },
-        info: { title: 'test', version: '0.0.1' }
-      },
-      headers: {
-        id: i,
-        sources: [
-          {
-            name: 'source' + (i + 1),
-            dateTime: moment().add(i, 'days').format(),
-            user: "mdm-admin"
-          }
-      ]
-      },
-      triples: [],
-      attachments: {
-        test: {
-            prop1: p[0],
-            prop2: p[1],
-            prop3: p[2]
-        }
-      }
-    }
-  };
-  return {
-    uri: '/merge-doc' + (i+1) + '.json',
-    collections: ['mdm-content', 'source' + (i + 1)],
-    content: content
-  };
-});
+let testDocs = testUtils.createDocuments([
+  // /doc1.json
+  { 'prop1': 'foo1', 'prop2': 'bar1' },
+  // /doc2.json
+  { 'prop1': 'foo2', 'prop2': 'bar2' }
+]);
 
 let optionsJSON = sm.createMergeOptions();
 optionsJSON.merge({
@@ -100,7 +68,7 @@ let uriToRestore = '';
 describe('Merge', () => {
 
   before((done) => {
-    client.mlClient.documents.write(docs)
+    client.mlClient.documents.write(testDocs)
     .result((res) => {
       return client.mergeOptions.write('merging-options-json', optionsJSON);
     })
@@ -113,7 +81,7 @@ describe('Merge', () => {
   });
 
   after((done) => {
-    client.mlClient.documents.remove(['/merge-doc1.json', '/merge-doc2.json'])
+    client.mlClient.documents.remove(['/doc1.json', '/doc2.json'])
     .result((res) => {
       return client.mergeOptions.remove('merging-options-json');
     })
@@ -133,7 +101,7 @@ describe('Merge', () => {
 
   it('should be run with options ref JSON previewed', () => {
     let options = {
-      uris: ['/merge-doc1.json', '/merge-doc2.json'],
+      uris: ['/doc1.json', '/doc2.json'],
       optionsName: 'merging-options-json',
       preview: true
     }
@@ -159,7 +127,7 @@ describe('Merge', () => {
    //   See the MarkLogic server error log for further detail.' } }
   xit('should be run with options content JSON previewed', () => {
     let options = {
-      uris: ['/merge-doc1.json', '/merge-doc2.json'],
+      uris: ['/doc1.json', '/doc2.json'],
       mergeOptions: optionsJSON,
       preview: true
     }
@@ -176,7 +144,7 @@ describe('Merge', () => {
 
   it('should be run with options content XML previewed', () => {
     let options = {
-      uris: ['/merge-doc1.json', '/merge-doc2.json'],
+      uris: ['/doc1.json', '/doc2.json'],
       mergeOptions: optionsXML,
       preview: true
     }
@@ -192,7 +160,7 @@ describe('Merge', () => {
 
   it('should be run with options ref XML merged', () => {
     let options = {
-      uris: ['/merge-doc1.json', '/merge-doc2.json'],
+      uris: ['/doc1.json', '/doc2.json'],
       optionsName: 'merging-options-xml',
       preview: false
     }
