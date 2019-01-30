@@ -21,7 +21,9 @@ let testDocs = testUtils.createDocuments([
   // /doc1.json
   { 'prop1': 'foo', 'prop2': 'bar', 'prop3': 'baz' },
   // /doc2.json
-  { 'prop1': 'foo', 'prop2': 'bar', 'prop3': 'bla' }
+  { 'prop1': 'foo', 'prop2': 'bar', 'prop3': 'bla' },
+  // /doc3.json
+  { 'prop1': 'faa', 'prop2': 'bar', 'prop3': 'baz' }
 ]);
 
 let optionsMatch = sm.createMatchOptions()
@@ -44,7 +46,7 @@ optionsMerge.merge({
       optionsMerge.sourceWeight("source2", 100),
     ] })
   .merge({
-    propertyName: 'prop3',
+    propertyName: 'prop2',
     maxValues: 1,
     sourceWeights: [
       optionsMerge.sourceWeight("source1", 100),
@@ -74,11 +76,6 @@ let queryNoMatches = {
 };
 queryNoMatches = JSON.stringify(queryNoMatches);
 
-/**
- * Note bug:
- * https://github.com/marklogic-community/smart-mastering-core/issues/271
- * When fixed, update to test merges and notifications together.
- */
 describe('Match and Merge', () => {
 
   before((done) => {
@@ -131,10 +128,12 @@ describe('Match and Merge', () => {
     }
     return client.matchMerge.run(options)
     .then((res) => {
-      assert.property(res, 'envelope');
-      let headers = res.envelope.headers;
+      // returns an array: [ merged-doc, notification ]
+      assert.property(res[0], 'envelope');
+      let headers = res[0].envelope.headers;
       assert.property(headers, 'sources');
       assert.property(headers, 'merges');
+      assert.property(res[1], 'notification');
     });
   });
 
@@ -147,10 +146,11 @@ describe('Match and Merge', () => {
     }
     return client.matchMerge.run(options)
     .then((res) => {
-      assert.property(res, 'envelope');
-      let headers = res.envelope.headers;
+      assert.property(res[0], 'envelope');
+      let headers = res[0].envelope.headers;
       assert.property(headers, 'sources');
       assert.property(headers, 'merges');
+      assert.property(res[1], 'notification');
     })
   });
 
@@ -162,8 +162,8 @@ describe('Match and Merge', () => {
     }
     return client.matchMerge.run(options)
     .then((res) => {
-      assert.property(res, 'envelope');
-      let headers = res.envelope.headers;
+      assert.property(res[0], 'envelope');
+      let headers = res[0].envelope.headers;
       assert.property(headers, 'sources');
       assert.property(headers, 'merges');
     })
@@ -177,7 +177,7 @@ describe('Match and Merge', () => {
     }
     return client.matchMerge.run(options)
     .then((res) => {
-      assert.equal(res, undefined);
+      assert.isEmpty(res);
     })
   });
 
