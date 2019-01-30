@@ -1,6 +1,5 @@
 const chai = require('chai'),
       moment = require('moment'),
-      parseXML = require('xml2js').parseString,
       sm = require('../lib/sm'),
       fs = require('fs'),
       testUtils = require('./test-utils');
@@ -90,20 +89,15 @@ describe('Notifications', () => {
     });
   });
 
-  it('should be created', (done) => {
+  it('should be created', () => {
     let options = {
       uris: ['/doc1.json', '/doc2.json', '/doc3.json', '/doc4.json'],
       optionsName: 'merge-options'
     };
-    client.matchMerge.run(options)
+    return client.matchMerge.run(options)
     .then((res) => {
-      // TODO test multipart response
-      done();
-      // TODO the below works for a response with 1 notification
-      // parseXML(res, function (err, result) {
-      //   assert.property(result, 'sm:notification');
-      //   done();
-      // })
+      assert.property(res[0], 'notification');
+      assert.equal(res.length, 2);
     });
   });
 
@@ -151,7 +145,7 @@ describe('Notifications', () => {
   it('should have status updated', () => {
     return client.notifications.update([notificationURIs], 'read')
     .then((res) => {
-      assert.isEmpty(res);
+      assert.equal(res, true);
     })
   });
 
@@ -165,7 +159,7 @@ describe('Notifications', () => {
   it('should be removed', () => {
     return client.notifications.remove(notificationURIs[0])
     .then((res) => {
-      assert.isEmpty(res);
+      assert.equal(res, true);
     })
   });
 
