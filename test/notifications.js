@@ -106,10 +106,19 @@ describe('Notifications', () => {
     .then((res) => {
       assert.property(res, 'notifications');
       assert.equal(res.total, 2);
-      // For later updating and removal
+      // For later reading, updating, and removal
       notificationURIs = res.notifications.map((notif) => {
         return notif.meta.uri;
       });
+    })
+  });
+
+  it('should be read', () => {
+    return client.notifications.read(notificationURIs[0])
+    .then((res) => {
+      assert.property(res, 'notification');
+      assert.property(res.notification, 'meta');
+      assert.property(res.notification.meta, 'status');
     })
   });
 
