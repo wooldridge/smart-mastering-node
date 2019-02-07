@@ -1,7 +1,6 @@
 const chai = require('chai'),
       sm = require('../lib/sm'),
-      mergeOptions = require('../lib/merge-options'),
-      fs = require('fs');
+      mergeOptions = require('../lib/merge-options');
 
 const assert = chai.assert;
 

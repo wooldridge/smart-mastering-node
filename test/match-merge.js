@@ -2,7 +2,6 @@ const chai = require('chai'),
       marklogic = require('marklogic'),
       moment = require('moment'),
       sm = require('../lib/sm'),
-      fs = require('fs'),
       testUtils = require('./test-utils');
 
 const assert = chai.assert;

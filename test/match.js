@@ -1,6 +1,5 @@
 const chai = require('chai'),
       sm = require('../lib/sm'),
-      fs = require('fs'),
       testUtils = require('./test-utils');
 
 const assert = chai.assert;

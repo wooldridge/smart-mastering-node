@@ -1,6 +1,5 @@
 const sm = require('../lib/sm'),
-      testUtils = require('../test/test-utils'),
-      fs = require('fs');
+      testUtils = require('../test/test-utils');
 
 // Run example as a Mocha test: mocha dblMetaphone-test.js
 //
