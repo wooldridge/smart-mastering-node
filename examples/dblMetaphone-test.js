@@ -2,7 +2,10 @@ const sm = require('../lib/sm'),
       testUtils = require('../test/test-utils'),
       fs = require('fs');
 
-// Run example as a Mocha test: mocha thesaurus-test.js
+// Run example as a Mocha test: mocha dblMetaphone-test.js
+//
+// TODO this example is not working, unable to get
+// dblMetaphone-based matches
 
 let client = sm.createClient({
   host: 'localhost',
@@ -16,47 +19,49 @@ let client = sm.createClient({
 
 let props = [
   // /doc1.json
-  { 'fname': 'Mike' },
+  { 'prop': 'Indefatigable' },
   // /doc2.json
-  { 'fname': 'Michael' },
+  { 'prop': 'Indefinite' },
   // /doc3.json
-  { 'fname': 'Ethel' },
+  { 'prop': 'Indefatigables' },
   // /doc4.json
-  { 'fname': 'Mike' }
+  { 'prop': 'Undefeated' },
+  // /doc5.json
+  { 'prop': 'Indefatigable' }
 ];
 
 let docs = testUtils.createDocuments(props);
 
-let myThesaurus = fs.readFileSync('./data/thesauri/first-name-thesaurus.xml', 'utf8');
-
-let myMatchThesaurusOptions = sm.createMatchOptions()
-  .exact({ propertyName: 'fname', weight: 4 })
-  .thesaurus({
-      propertyName: 'fname',
+let myDblMetaphoneOptions = sm.createMatchOptions()
+  .exact({ propertyName: 'prop', weight: 4 })
+  .dblMetaphone({
+      propertyName: 'prop',
       weight: 2,
-      thesaurus: 'first-name-thesaurus.xml'
+      dictionary: 'test.xml',
+      threshold: 1,
+      collation: 'http://marklogic.com/collation/codepoint'
     })
   .threshold({ above: 1, label: 'Possible Match', action: 'notify' })
   .threshold({ above: 3, label: 'Definitive Match', action: 'merge' });
 
-myMatchThesaurusOptions = JSON.stringify(myMatchThesaurusOptions);
+myDblMetaphoneOptions = JSON.stringify(myDblMetaphoneOptions);
 
-describe('Thesaurus Test', function () {
+describe('DblMetaphone Test', function () {
 
   before((done) => {
     client.mlClient.documents.write(docs)
     .result((res) => {
-      return client.thesauri.write('first-name-thesaurus.xml', myThesaurus);
+      return client.matchOptions.write('match-options', myDblMetaphoneOptions);
     })
     .then((res) => {
       done();
     })
   });
 
-  it('should run a match with a thesaurus option', () => {
+  it('should run a match with a dblMetaphone option', () => {
     return client.match.run({
       uri: '/doc1.json',
-      matchOptions: myMatchThesaurusOptions
+      optionsName: 'match-options'
     })
     .then((result) => {
       console.log(result);
@@ -66,7 +71,10 @@ describe('Thesaurus Test', function () {
   after((done) => {
     client.mlClient.documents.remove(docs.map((doc) => {return doc.uri}))
     .result((res) => {
-      return client.thesauri.remove('first-name-thesaurus.xml');
+      return client.matchOptions.remove('match-options');
+    })
+    .then((res) => {
+      return client.mlClient.documents.removeAll({collection: 'mdm-dictionary'});
     })
     .then((res) => {
       done();
