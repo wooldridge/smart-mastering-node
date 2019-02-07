@@ -26,7 +26,7 @@ describe('Match Builder', () => {
     matchOptions.thesaurus({
       propertyName: 'foo',
       weight: 10,
-      thesaurus: '/mdm/config/thesauri/test.xml'
+      thesaurus: 'test.xml'
     });
     assert.deepEqual(matchOptions.options.algorithms.algorithm[0],
       { name: 'thesaurus',
